@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reasons Why The Band Lost Today — Generator</title>
+  <style>
+    :root {
+      --bg: #0b0c10; --panel:#111317; --ink:#e6edf3; --muted:#9aa4af; --accent:#7dd3fc; --accent2:#a78bfa;
+    }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; color: var(--ink); background: radial-gradient(1200px 600px at 70% -10%, #0f172a 0%, var(--bg) 50%); }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    header { text-align: center; margin-bottom: 18px; }
+    .dice { font-size: clamp(72px, 10vw, 140px); line-height: 1; display: block; }
+    h1 { margin: 8px 0 4px; font-size: clamp(22px, 3.2vw, 40px); letter-spacing: .4px; }
+    .tagline { color: var(--muted); font-size: clamp(14px, 2.2vw, 18px); }
+
+    .grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+    @media (min-width: 900px){ .grid { grid-template-columns: 1.1fr .9fr; } }
+
+    .card { background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.10); border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,.25); }
+    .pad { padding: 16px; }
+    .controls { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    label { font-size: 14px; color: var(--muted); }
+    select, input[type="number"], button { background:#0f1217; color:var(--ink); border:1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 10px 12px; font: inherit; }
+    button { cursor: pointer; transition: transform .06s ease, background .2s ease; }
+    button:hover { transform: translateY(-1px); }
+    .primary { border-color: rgba(125,211,252,.6); box-shadow: inset 0 0 0 1px rgba(125,211,252,.4); }
+    .good { border-color: rgba(167,139,250,.6); box-shadow: inset 0 0 0 1px rgba(167,139,250,.4); }
+
+    .row { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .row-3 { display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+    .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: .2em; color:#bfd5ff; margin: 0 0 8px; }
+    .hr { height:1px; background: linear-gradient(90deg,transparent, rgba(255,255,255,.1), transparent); margin: 12px 0; }
+
+    .out { min-height: 220px; display: grid; gap:10px; }
+    .reason { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 12px; line-height: 1.4; }
+    .muted { color: var(--muted); }
+    .count { font-size: 12px; color: var(--muted); }
+
+    footer { margin-top: 16px; text-align: center; color: var(--muted); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <span class="dice">🎲</span>
+      <h1>LET’S ROLL THE DICE. HOW WE DOING THIS CONTEST???</h1>
+      <div class="tagline">Spin up totally plausible, wildly implausible, and aggressively honest reasons why the band lost today.</div>
+    </header>
+
+    <div class="grid">
+      <section class="card pad">
+        <div class="section-title">Generator Controls</div>
+        <div class="controls">
+          <button id="roll" class="primary">Roll Reasons</button>
+          <button id="copy" class="good">Copy Output</button>
+          <span class="count" id="count"></span>
+        </div>
+        <div class="hr"></div>
+        <div class="row-3">
+          <label><input type="checkbox" id="incInsane" checked> Include insane/unhinged</label>
+          <label><input type="checkbox" id="incValid" checked> Include valid reasons</label>
+          <label><input type="checkbox" id="incLame" checked> Include lame band excuses</label>
+        </div>
+        <div class="row-3" style="margin-top:8px;">
+          <label><input type="checkbox" id="incJudge" checked> Include judge quotes</label>
+          <label><input type="checkbox" id="incHonest" checked> Include brutally honest</label>
+          <label>How many? <input type="number" id="howMany" min="1" max="25" step="1" value="8" style="width:90px"/></label>
+        </div>
+      </section>
+
+      <section class="card pad">
+        <div class="section-title">Your Reasons</div>
+        <div id="out" class="out"></div>
+      </section>
+    </div>
+
+    <footer>Pro tip: print this for the bus home or read aloud at the beer tent.</footer>
+  </div>
+
+<script>
+  // --- Source lists --------------------------------------------------
+  const insane = [
+    "The judge is a Pisces.",
+    "Our drones were only in tune if you stood exactly northwest at 73°.",
+    "Half the band switched to oat milk lattes this week.",
+    "The beer tent was run by the rival band’s treasurer.",
+    "A sheep wandered past during ‘Ca’ the Ewes’ and spooked us.",
+    "Global warming shifted our drones by 7 cents.",
+    "Donald MacLeod’s ghost sabotaged the bass rolls.",
+    "We were perfectly in time… in our advanced polyrhythm universe.",
+    "Our tartan pattern blinded the judges.",
+    "Winners are picked 3 years in advance by the Pipe Band Illuminati."
+  ];
+
+  const valid = [
+    "Chanter or drone tuning drifted.",
+    "Tempo rushed or dragged (especially reels).",
+    "Pipes and drums out of balance.",
+    "Strike-ins and breaks not together.",
+    "Chanter section tone uneven across players.",
+    "Mistakes, crossing noises, or drone cut-outs.",
+    "Weak musical expression (flat march, lifeless strathspey).",
+    "Tunes too ambitious for the grade.",
+    "Weather killed reed stability.",
+    "Contest nerves caused shaky blowing."
+  ];
+
+  const lame = [
+    "The circle was too tight.",
+    "The steward rushed us.",
+    "The wind was blowing directly into my drones.",
+    "The drummer’s stand was wobbly.",
+    "We couldn’t hear the PM’s foot.",
+    "The tuning park was on a hill.",
+    "The sun was in my eyes during the reel.",
+    "The other band distracted us with their warmup.",
+    "Half the tenors forgot their mallets.",
+    "The PM had a pint too many at lunch."
+  ];
+
+  const honest = [
+    "We should’ve actually learned the tunes before this weekend.",
+    "Half the pipers only showed up to two practices this month.",
+    "Our PM kept changing the settings and we never settled on one version.",
+    "We spent more time arguing about the tartan than practicing.",
+    "We blew the first five minutes of warm-up on selfies.",
+    "Nobody practiced their chanter at home.",
+    "The drum corps wrote the score in the car park.",
+    "Our tenors don’t know the flourishing pattern; they just make it up.",
+    "We got absolutely hammered at the ceilidh last night.",
+    "We’ve been coasting on last year’s set instead of improving."
+  ];
+
+  // Judge quotes must keep explicit attribution
+  const judge = [
+    "\"Not quite what I was looking for today.\" — worthless judge’s sheets",
+    "\"Could use more lift.\" — worthless judge’s sheets",
+    "\"Tone generally fine but lacking in some places.\" — worthless judge’s sheets",
+    "\"More drive needed in the reel.\" — worthless judge’s sheets",
+    "\"Band didn’t quite settle.\" — worthless judge’s sheets",
+    "\"Expression could be more musical.\" — worthless judge’s sheets",
+    "\"A little untidy overall.\" — worthless judge’s sheets",
+    "\"Some imbalance somewhere.\" — worthless judge’s sheets",
+    "\"Phrasing not quite convincing.\" — worthless judge’s sheets",
+    "\"Not enough sparkle.\" — worthless judge’s sheets"
+  ];
+
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  function rollReasons(){
+    const incInsane = document.getElementById('incInsane').checked;
+    const incValid = document.getElementById('incValid').checked;
+    const incLame = document.getElementById('incLame').checked;
+    const incJudge = document.getElementById('incJudge').checked;
+    const incHonest = document.getElementById('incHonest').checked;
+    const howMany = Math.max(1, Math.min(25, parseInt(document.getElementById('howMany').value || '8', 10)));
+
+    let pool = [];
+    if(incInsane) pool = pool.concat(insane);
+    if(incValid) pool = pool.concat(valid);
+    if(incLame) pool = pool.concat(lame);
+    if(incJudge) pool = pool.concat(judge);
+    if(incHonest) pool = pool.concat(honest);
+
+    if(!pool.length) pool = ["No categories selected. The real reason: we forgot the pipes at home."];
+
+    // sample without hard duplicates; allow repeats if howMany > pool length
+    const out = [];
+    const used = new Set();
+    while(out.length < howMany){
+      const r = pick(pool);
+      if(pool.length <= howMany || !used.has(r)){
+        out.push(r);
+        used.add(r);
+      }
+      if(used.size === pool.length) used.clear(); // permit repeats after exhausting
+    }
+
+    const box = document.getElementById('out');
+    box.innerHTML = '';
+    out.forEach((line, i) => {
+      const div = document.createElement('div');
+      div.className = 'reason';
+      div.textContent = `${i+1}. ${line}`;
+      box.appendChild(div);
+    });
+
+    document.getElementById('count').textContent = `${out.length} reasons rolled`;
+  }
+
+  function copyOutput(){
+    const lines = Array.from(document.querySelectorAll('.reason')).map(x=>x.textContent);
+    const text = `Reasons why the band lost today (roll):\n` + lines.join('\n');
+    navigator.clipboard.writeText(text).then(()=>{
+      const btn = document.getElementById('copy');
+      const old = btn.textContent; btn.textContent = 'Copied!';
+      setTimeout(()=> btn.textContent = old, 1200);
+    });
+  }
+
+  document.getElementById('roll').addEventListener('click', rollReasons);
+  document.getElementById('copy').addEventListener('click', copyOutput);
+
+  // First roll on load
+  rollReasons();
+</script>
+</body>
+</html>
